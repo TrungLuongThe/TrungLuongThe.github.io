@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathHouse - Bài tập trắc nghiệm</title>
+    <style>
+        /* CSS để làm đẹp trang */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 25px 30px;
+        }
+
+        h1 {
+            color: #0056b3; /* Màu xanh chủ đạo */
+            text-align: center;
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        p {
+            text-align: center;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .name-input {
+            margin-bottom: 20px;
+        }
+
+        .name-input label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .name-input input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box; /* Quan trọng để padding không làm vỡ layout */
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #e0e0e0;
+            margin: 25px 0;
+        }
+
+        h3 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Lưới chứa các ô trả lời */
+        #answer-grid {
+            display: grid;
+            /* Tự động chia cột, mỗi cột tối thiểu 100px */
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .answer-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .answer-item label {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-right: 10px;
+            color: #555;
+        }
+
+        .answer-item input[type="text"] {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 700;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            /* Tự động viết hoa */
+            text-transform: uppercase;
+        }
+        
+        .answer-item input[type="text"]:focus {
+            outline: none;
+            border-color: #0056b3;
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.2);
+        }
+
+        /* Class CSS cho đáp án đúng/sai */
+        .correct {
+            background-color: #d4edda !important; /* Xanh lá */
+            border-color: #c3e6cb !important;
+        }
+
+        .incorrect {
+            background-color: #f8d7da !important; /* Đỏ */
+            border-color: #f5c6cb !important;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #submitBtn {
+            background-color: #007bff; /* Xanh dương */
+            color: white;
+            margin-right: 15px;
+        }
+
+        #submitBtn:hover {
+            background-color: #0056b3;
+        }
+
+        #resetBtn {
+            background-color: #6c757d; /* Xám */
+            color: white;
+        }
+
+        #resetBtn:hover {
+            background-color: #5a6268;
+        }
+
+        /* Khu vực kết quả */
+        #results {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 600;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        /* Class CSS cho thông báo kết quả */
+        .pass {
+            color: #155724; /* Xanh lá đậm */
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+
+        .fail {
+            color: #721c24; /* Đỏ đậm */
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .error {
+            color: #721c24; /* Đỏ đậm */
+            font-size: 1em;
+            font-weight: normal;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>MathHouse - Bài tập trắc nghiệm ôn tập tỉ lệ thức</h1>
+        <p>Nội dung: Tỉ lệ thức, dãy tỉ số bằng nhau, tỉ lệ thuận, tỉ lệ nghịch.<br>
+           Yêu cầu: Trả lời đúng tối thiểu <b>17/20</b> câu để hoàn thành.Chọn E nếu tính ra đáp án khác</p>
+        
+        <div class="name-input">
+            <label for="studentName">Vui lòng nhập tên của bạn:</label>
+            <input type="text" id="studentName" placeholder="Ví dụ: Nguyễn Văn A">
+        </div>
+        
+        <hr>
+        <h3>PHIẾU TRẢ LỜI TRẮC NGHIỆM</h3>
+        <div id="answer-grid">
+            </div>
+        
+        <div class="button-container">
+            <button id="submitBtn">Nộp bài</button>
+            <button id="resetBtn">Làm lại</button>
+        </div>
+        
+        <div id="results">
+            </div>
+    </div>
+
+    <script>
+        // --- PHẦN LOGIC CỦA TRANG WEB ---
+
+        // 1. Lưu trữ đáp án đúng (ĐÃ CẬP NHẬT VỚI BỘ ĐÁP ÁN MỚI)
+        const correctAnswers = {
+            1: 'A', 2: 'A', 3: 'A', 4: 'B', 5: 'B',
+            6: 'C', 7: 'D', 8: 'A', 9: 'B', 10: 'B',
+            11: 'A', 12: 'A', 13: 'D', 14: 'A', 15: 'A',
+            16: 'A', 17: 'C', 18: 'A', 19: 'C', 20: 'A'
+        };
+        
+        const TOTAL_QUESTIONS = 20;
+        const MIN_PASS_SCORE = 17;
+
+        // 2. Lấy các phần tử HTML cần thiết
+        const answerGrid = document.getElementById('answer-grid');
+        const submitBtn = document.getElementById('submitBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultsDiv = document.getElementById('results');
+        const studentNameInput = document.getElementById('studentName');
+
+        // 3. Tự động tạo 20 ô trả lời
+        document.addEventListener('DOMContentLoaded', () => {
+            let gridHTML = '';
+            for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                gridHTML += `
+                    <div class="answer-item">
+                        <label for="answer-${i}">${i}.</label>
+                        <input type="text" id="answer-${i}" maxlength="1" data-index="${i}">
+                    </div>
+                `;
+            }
+            answerGrid.innerHTML = gridHTML;
+        });
+        
+        // 4. Cải tiến UX: Tự động nhảy sang ô tiếp theo
+        answerGrid.addEventListener('input', function(e) {
+            if (e.target.tagName === 'INPUT' && e.target.value.length === 1) {
+                e.target.value = e.target.value.toUpperCase();
+                
+                const currentIndex = parseInt(e.target.dataset.index, 10);
+                if (currentIndex < TOTAL_QUESTIONS) {
+                    const nextInput = document.getElementById(`answer-${currentIndex + 1}`);
+                    if (nextInput) {
+                        nextInput.focus();
+                    }
+                }
+            }
+        });
+
+
+        // 5. Hàm xử lý khi nhấn nút "Nộp bài"
+        function checkAnswers() {
+            const studentName = studentNameInput.value.trim();
+            
+            resultsDiv.innerHTML = '';
+            resultsDiv.className = '';
+            
+            if (studentName === '') {
+                resultsDiv.innerHTML = '<span class="error">Bạn vui lòng nhập tên trước khi nộp bài!</span>';
+                studentNameInput.focus();
+                return;
+            }
+
+            let score = 0;
+            let allAnswered = true;
+
+            // Lặp qua 20 câu để chấm điểm
+            for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                const input = document.getElementById(`answer-${i}`);
+                const parentItem = input.parentElement;
+                const userAnswer = input.value.trim().toUpperCase();
+                
+                parentItem.classList.remove('correct', 'incorrect');
+
+                if (userAnswer === '') {
+                    allAnswered = false;
+                } else if (userAnswer === correctAnswers[i]) {
+                    score++;
+                    parentItem.classList.add('correct');
+                } else {
+                    parentItem.classList.add('incorrect');
+                }
+            }
+            
+            // Hiển thị kết quả
+            let resultHTML = `<h3>Kết quả của bạn: ${studentName}</h3>`;
+            resultHTML += `<p>Số câu trả lời đúng: <strong>${score}/${TOTAL_QUESTIONS}</strong></p>`;
+            
+            if (!allAnswered) {
+                 resultHTML += `<p class="error" style="font-size: 1em;">(Lưu ý: Bạn chưa hoàn thành tất cả các câu)</p>`;
+            }
+
+            // Kiểm tra điều kiện qua môn
+            if (score >= MIN_PASS_SCORE) {
+                resultHTML += `<p><strong>Chúc mừng, bạn đã hoàn thành!</strong></p>`;
+                resultsDiv.className = 'pass';
+            } else {
+                resultHTML += `<p><strong>Bạn cần đạt tối thiểu ${MIN_PASS_SCORE}/${TOTAL_QUESTIONS} câu. Hãy làm lại nhé!</strong></p>`;
+                resultsDiv.className = 'fail';
+            }
+
+            resultsDiv.innerHTML = resultHTML;
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 6. Hàm xử lý khi nhấn nút "Làm lại"
+        function resetQuiz() {
+            for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                const input = document.getElementById(`answer-${i}`);
+                input.value = '';
+                input.parentElement.classList.remove('correct', 'incorrect');
+            }
+            
+            resultsDiv.innerHTML = '';
+            resultsDiv.className = '';
+            studentNameInput.value = '';
+            studentNameInput.focus();
+        }
+
+        // 7. Gán sự kiện cho các nút
+        submitBtn.addEventListener('click', checkAnswers);
+        resetBtn.addEventListener('click', resetQuiz);
+
+    </script>
+
+</body>
+</html>
